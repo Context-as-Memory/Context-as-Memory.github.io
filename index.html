@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Context as Memory: Scene-Consistent Interactive Long Video Generation with Memory Retrieval">
+  <meta name="keywords" content="Video Diffusion Model, Interactive Long Video Generation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Context as Memory: Scene-Consistent Interactive Long Video Generation with Memory Retrieval</title>
+
+  <!-- Google tag (gtag.js) -->
+<!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QCJY998LVV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'G-QCJY998LVV');
+  </script> -->
+  
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <style>
+    .card-image video {
+      width: 150%;
+      height: 150%;
+      object-fit: cover;
+    }
+    .gif-card .card-image {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .gif-card .card-image img {
+      object-fit: cover;
+    }
+    .gif-card .card-content {
+      width: 100%;
+    }
+    .smaller-text {
+      font-size: 0.8rem;
+    }
+    .smallest-text {
+      font-size: 0.5rem;
+    }
+    .section-divider {
+    border-top: 1px solid #dbdbdb;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  .wider-video-container {
+    max-width: 1600px !important;  /* Increase this value to make the container wider */
+    width: 90% !important;  /* This ensures some margin on very wide screens */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .wider-column {
+    padding: 0.75rem;
+  }
+    
+  </style>
+</head>
+<body>
+
+
+<style>
+  /* —— 只需新增或合并这几行 —— */
+  .title-box {
+    position: relative;
+    display: inline-block;          /* 让标题整体在父元素中可居中 */
+  }
+  .title-box .icon-left {
+    position: absolute;
+    left: -180px;                   /* 调整图标“伸出”标题左侧的距离 */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 150px;                  /* 与原高度一致，可按需改 */
+  }
+</style>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+
+          <!-- ======= 图标 + 标题 ======= -->
+          <div class="title-box">
+            <img src="pics/icon.png" class="icon-left" alt="icon">
+            <h1 class="title is-1 publication-title">
+              Context as Memory:<br>
+              Scene-Consistent Interactive Long Video Generation with Memory Retrieval
+            </h1>
+          </div>
+
+          <!-- ======= 作者 ======= -->
+          <div class="is-size-5 publication-authors" style="margin-top:1.2rem">
+            <span class="author-block has-text-centered">
+              <b>Anonymous authors</b>
+            </span>
+          </div>
+
+          
+        </div> <!-- column -->
+      </div>   <!-- columns -->
+    </div>     <!-- container -->
+  </div>       <!-- hero-body -->
+</section>
+
+
+<section class="hero is-small" style="margin-top: -50px;">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-">
+          <h2 class="subtitle has-text-justified">
+            <b>TL;DR:</b> We propose <b>Context-as-Memory</b> for scene-consistent interactive long video generation, using historical context as memory with two simple designs: (1) storing context as memory in frame format and (2) injecting context by concatenating it along the frame dimension at the input. To reduce computational overhead from considering all historical context, we introduce <b>Memory Retrieval</b> to select the most relevant context frames based on FOV overlap detection.
+          </h2>
+          <!-- <br> -->
+          <div class="columns is-centered has-text-justified">
+            <td colspan="3">
+              <div style="text-align: center; width: 100%;">
+                
+                <video muted autoplay="autoplay" loop="loop" width="100%" preload controls poster="./videos/ReCamMaster/TEASER.jpg">
+                  <source src="./video/demo.mov" type="video/mp4">
+                </video>
+
+                
+              </div>
+            </td>
+          </div>
+          <p class="has-text-centered" style="margin-top: 1rem; margin-bottom: 1rem; color: rgb(228, 77, 94); font-weight: 500;">
+            We strongly recommend watching the video to quickly understand our method and see our demo results.
+          </p>
+          <p><br></p>
+</section>
+
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-">
+          <h2 class="title is-2">Demos</h2>
+          
+          <!-- First row - 2 videos -->
+          <div class="columns is-centered">
+            <div class="column is-half">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/demo/demo1.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Demo #1: "A traditional Japanese townscape featuring a vivid red arched bridge, torii gates, wooden boats, and classic tiled-roof buildings lining the waterfront."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-half">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/demo/demo2.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Demo #2: "An industrial-style warehouse, featuring stacked crates, oil drums, industrial equipment, gas cylinders, a staircase, and a yellow-black construction vehicle, all arranged in a clean and organized manner."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Second row - 2 videos -->
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-half">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/demo/demo3.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Demo #3: "An ancient temple with a reddish-brown stone structure and dome sits in a lush forested valley, surrounded by greenery and misty mountains, exuding tranquility."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-half">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/demo/demo4.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Demo #4: "A busy shipping yard filled with colorful stacked containers, industrial buildings, forklifts, and signs of active cargo operations under a partly cloudy sky."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Third row - 1 centered video -->
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-6" style="margin: 0 auto;">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/demo/demo5.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Demo #5: "A charming coastal village scene featuring brightly painted wooden houses, a lighthouse, and winding stone paths under a partly cloudy sky."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Method section -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-">
+          <h2 class="title is-2">Method</h2>
+          <div class="content has-text-justified my_link">
+            <p>
+              Current interactive long video generation methods lack scene-consistent memory, often resulting in completely different scenes when simply looking left and right within a short time span. This issue stems from the limited utilization of historical context. Below, we introduce our approach to leveraging unlimited historical context to ensure scene-consistent memory in newly generated video frames.
+            </p>
+          </div>
+          <div class="columns is-centered has-text-justified">
+            <td colspan="3">
+              <img src="pics/framework.jpg" width="100%" />
+            </td>
+          </div>
+          <div class="content has-text-justified my_link">
+            <td colspan="3">
+              <p>
+                (a) We propose <b>Context-as-Memory</b>, where all historical context frames serve as memory conditions in the generation of predicted frames, with <b>Memory Retrieval</b> extracting relevant information from all context frames. (b) Our proposed <b>Memory Retrieval</b> method is a search algorithm based on camera trajectories. It selects relevant frames by evaluating the overlap between camera views of different frames.
+              </p>
+            </td>
+          </div>
+          <p><br></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Open Domain Results section -->
+
+<section class="hero is-small">
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const videos = document.querySelectorAll("video");
+      videos.forEach(video => {
+        video.playbackRate = 2.0;
+      });
+    });
+  </script>
+  
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <h2 class="title is-2">Open Domain Results</h2>
+          <div class="content has-text-justified my_link">
+            <p>
+              We collected some open-domain images from the internet and attempted to generate long videos using our method to test whether memory capabilities can be achieved in scenes unseen during training. The answer is yes. However, it's worth noting that open-domain capabilities largely depend on the pre-trained model's capabilities. We currently use a relatively small 1B parameter model, which has limited generation capabilities for complex trajectories. A future direction would be to validate our method on larger and more powerful pre-trained models.
+            </p>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/1.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #1: "Japanese landscape, Mount Fuji, blue sky, red and white pagoda, cherry blossom trees, cultural harmony, natural beauty."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/2.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #2: "Black Myth Wukong, snow-covered stone pathway, ancient temple, wintry forest, towering trees, solemn statues, sacred ambiance, icicles, frost, mist, solemn tranquility, timeless mystery."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/3.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #3: "Black Myth Wukong, mist-laden forest, weathered wooden structure, overgrown vegetation, moss-covered stone steps, ornate tiled roof, haunting beauty, serene atmosphere, distant cliffs, abandoned mountain sanctuary."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/4.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #4: "Black Myth Wukong, a barren landscape of red and grey features a desolate shrine with weathered East Asian architecture, a lone stone statue, and a twisted lifeless tree under churning thunderclouds, casting dynamic shadows and creating a foreboding atmosphere."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/5.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #5: "A sunlit alpine valley shows logs by a rustic cabin, surrounded by meadows, forests, and towering mountains. The breeze gently stirs the grass, enhancing the scene's tranquil isolation."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/6.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #6: "The Legend of Zelda, vibrant green fields, wildflowers, sprawling landscape, winding rivers, distant ruins, towering mountains, clear blue sky, colossal mechanical structure, epic scale, boundless exploration."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/7.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #7: "Genshin Impact, a festival pier glows with lanterns, featuring a poised girl in traditional attire amid dragon-shaped lanterns and swaying pavilions, all under a magical twilight sky."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/8.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #8: "Genshin Impact, a gentle pan reveals a vibrant countryside village in golden morning light, with a windmill turning above timber-framed houses and drifting dandelion seeds. Castle-like towers in the distance add to the storybook-like tranquility."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/9.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #9: "A smooth tracking shot sweeps through a sunlit high-rise office, showcasing ergonomic workstations and a stunning cityscape view. The calm, professional space evokes quiet productivity and modern design."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/10.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #10: "A bright, open-plan office features minimalist desks, ergonomic chairs, and calming greenery, all under natural and LED lighting, emphasizing modern productivity."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/11.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #11: "A serene bedroom features a neatly made bed with cream bedding, wooden nightstands, and minimalist decor. Soft natural light and framed artwork enhance the calm, refined atmosphere."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/12.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #12: "A slow glide through a formal garden reveals a circular stone pedestal, symmetrical hedges, and blooming rose bushes. Ornamental urns and stone paths evoke the elegance of a historical estate."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/13.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #13: "An aerial view glides over a winding path in an alpine meadow, with golden sunlight and mist creating a serene morning scene. Rugged mountain peaks in warm light contrast with the cool sky, evoking natural grandeur."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/14.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #14: "A slow zoom captures a tranquil alpine forest and a mountain range glowing in the sunset. A still body of water reflects snow-capped peaks and evergreens, creating a serene, awe-inspiring twilight scene."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/15.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #15: "A sunlit view of a frozen alpine basin surrounded by snow-covered peaks. The camera pans, highlighting the contrast between sunlit ridges and shaded slopes. Pine trees and weathered rocks add to the quiet, majestic winter landscape."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/16.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #16: "A tranquil lakeside scene reflects a snow-capped mountain, with golden light revealing shoreline buildings amidst vibrant autumn foliage. Fiery red maple leaves frame the view, enhancing the serene harmony of nature and human settlement."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/17.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #17: "A sunlit mountain path winds through a lush valley with wildflowers and a rustic cabin. Snow-capped peaks rise above, set against a crisp blue sky, creating a serene, untouched atmosphere."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/18.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #18: "A sunny alpine path curves along a hillside, bordered by evergreens and a stone wall. A fence overlooks a valley with rooftops. Limestone cliffs and snow-draped peaks complete the peaceful scene."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column is-one-third">
+              <div class="card">
+                <div class="card-image">
+                  <video muted loop="loop" width="100%" preload controls>
+                    <source src="./video/more_results/19.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <div class="card-content">
+                  <div class="content">
+                    <p class="smaller-text">Result #19: "In an arid desert under a burnt-orange sky, a dusty six-wheeled rover stands amid scattered components, evoking a Mars expedition base."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            The template is borrowed from <a href="https://nerfies.github.io/">Nerfies</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
