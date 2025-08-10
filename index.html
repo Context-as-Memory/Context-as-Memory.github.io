@@ -78,6 +78,37 @@
 <body>
 
 
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More of Our Research Work about World Model
+          </a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://iranqin.github.io/WorldSimBench.github.io/">
+              WorldSimBench (ICML 2025)
+            </a>
+            <a class="navbar-item" href="https://yujiwen.github.io/gamefactory/">
+              GameFactory (ICCV 2025 Highlight)
+            </a>
+            <a class="navbar-item" href="https://arxiv.org/abs/2503.17359">
+              Position Paper about Interactive Video Generation
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
 <style>
   /* —— 只需新增或合并这几行 —— */
   .title-box {
@@ -107,11 +138,59 @@
               Scene-Consistent Interactive Long Video Generation with Memory Retrieval
             </h1>
           </div>
+          <div style="color: #e74c3c; font-weight: bold; font-size: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+            SIGGRAPH Asia 2025
+          </div>
 
           <!-- ======= 作者 ======= -->
-          <div class="is-size-5 publication-authors" style="margin-top:1.2rem">
+          <!-- <div class="is-size-5 publication-authors" style="margin-top:1.2rem">
             <span class="author-block has-text-centered">
               <b>Anonymous authors</b>
+            </span>
+          </div> -->
+          <div class="is-size-5 publication-authors" style="margin-top:1.2rem">
+            <span class="author-block has-text-centered">
+              <a href="https://yujiwen.github.io/">Jiwen Yu</a><sup>1†</sup>,
+              <a href="https://jianhongbai.github.io/">Jianhong Bai</a><sup>2†</sup>,
+              <a href="https://iranqin.github.io/">Yiran Qin</a><sup>1</sup>,
+              <a href="https://liuquande.github.io/">Quande Liu</a><sup>3#</sup><br>
+              <a href="https://xinntao.github.io/">Xintao Wang</a><sup>3</sup>,
+              <a href="https://scholar.google.com.hk/citations?user=P6MraaYAAAAJ">Pengfei Wan</a><sup>3</sup>,
+              <a href="https://openreview.net/profile?id=~Di_ZHANG3">Di Zhang</a><sup>3</sup>,
+              <a href="https://xh-liu.github.io/">Xihui Liu</a><sup>1#</sup><br>
+              <sup>1</sup>University of Hong Kong,&nbsp;
+              <sup>2</sup>Zhejiang University,&nbsp;
+              <sup>3</sup>Kuaishou Technology<br>
+              <sup>†</sup>Intern at KwaiVGI, Kuaishou Technology,&nbsp;
+              <sup>#</sup>Corresponding authors
+            </span>
+          </div>
+
+          <!-- ======= 链接按钮 ======= -->
+          <div class="publication-links" style="margin-top:1.2rem">
+            <!-- ArXiv -->
+            <span class="link-block">
+              <a href="https://arxiv.org/abs/2506.03141" target="_blank"
+                 class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="ai ai-arxiv"></i></span>
+                <span>arXiv</span>
+              </a>
+            </span>
+            <!-- GitHub -->
+            <span class="link-block">
+              <a href="https://github.com/KwaiVGI/Context-as-Memory" target="_blank"
+                 class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="fab fa-github"></i></span>
+                <span>GitHub&nbsp;(Coming Soon)</span>
+              </a>
+            </span>
+            <!-- Hugging Face -->
+            <span class="link-block">
+              <a href="https://huggingface.co/datasets/KwaiVGI/Context-as-Memory" target="_blank"
+                 class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><img src="pics/hf.png" alt="Dataset"></span>
+                <span>Dataset&nbsp;(Coming Soon)</span>
+              </a>
             </span>
           </div>
 
@@ -579,6 +658,20 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{yu2025cam,
+      title={Context as Memory: Scene-Consistent Interactive Long Video Generation with Memory Retrieval},
+      author={Yu, Jiwen and Bai, Jianhong and Qin, Yiran and Liu, Quande and Wang, Xintao and Wan, Pengfei and Zhang, Di and Liu, Xihui},
+      journal={arXiv preprint arXiv:2506.03141},
+      year={2025}
+}
+</code></pre>
   </div>
 </section>
 
